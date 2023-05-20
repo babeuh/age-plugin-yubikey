@@ -7,6 +7,8 @@ use yubikey::{
     Key, PinPolicy, TouchPolicy, YubiKey,
 };
 
+use std::env;
+
 use crate::{
     error::Error,
     fl,
@@ -120,13 +122,20 @@ impl IdentityBuilder {
 
         if let PinPolicy::Always = pin_policy {
             // We need to enter the PIN again.
-            let pin = Password::new()
-                .with_prompt(fl!(
-                    "plugin-enter-pin",
-                    yubikey_serial = yubikey.serial().to_string(),
-                ))
-                .report(true)
-                .interact()?;
+            let pin = match env::var("AGE_YUBIKEY_PIN") {
+                Ok(value) => {
+                    value
+                },
+                Err(err) => {
+                    Password::new()
+                    .with_prompt(fl!(
+                        "plugin-enter-pin",
+                        yubikey_serial = yubikey.serial().to_string(),
+                    ))
+                    .report(true)
+                    .interact()?
+                }
+            };
             yubikey.verify_pin(pin.as_bytes())?;
         }
         if let TouchPolicy::Never = touch_policy {

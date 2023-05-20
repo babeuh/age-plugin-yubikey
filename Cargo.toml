@@ -1,9 +1,9 @@
 [package]
 name = "age-plugin-yubikey"
 description = "YubiKey plugin for age clients"
-version = "0.4.0"
-authors = ["Jack Grigg <thestr4d@gmail.com>"]
-repository = "https://github.com/str4d/age-plugin-yubikey"
+version = "0.4.0+envsupport"
+authors = ["Jack Grigg <thestr4d@gmail.com>", "babeuh"]
+repository = "https://github.com/babeuh/age-plugin-yubikey"
 readme = "README.md"
 keywords = ["age", "cli", "encryption", "yubikey"]
 categories = ["command-line-utilities", "cryptography"]

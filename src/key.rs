@@ -10,6 +10,7 @@ use bech32::{ToBase32, Variant};
 use dialoguer::Password;
 use log::{debug, error, warn};
 use std::convert::Infallible;
+use std::env;
 use std::fmt;
 use std::io;
 use std::iter;
@@ -671,29 +672,36 @@ impl Connection {
         }
 
         // The policy requires a PIN, so request it.
-        let pin = match request_pin(
-            |prev_error| {
-                callbacks.request_secret(&format!(
-                    "{}{}{}",
-                    prev_error.as_deref().unwrap_or(""),
-                    prev_error.as_deref().map(|_| " ").unwrap_or(""),
-                    fl!(
-                        "plugin-enter-pin",
-                        yubikey_serial = self.yubikey.serial().to_string(),
-                    )
-                ))
+        let pin = match env::var("AGE_YUBIKEY_PIN") {
+            Ok(value) => {
+                SecretString::new(value)
             },
-            self.yubikey.serial(),
-        )? {
-            Ok(pin) => pin,
-            Err(_) => {
-                return Ok(Err(identity::Error::Identity {
-                    index: self.identity_index,
-                    message: fl!(
-                        "plugin-err-pin-required",
-                        yubikey_serial = self.yubikey.serial().to_string(),
-                    ),
-                }))
+            Err(err) => {
+                match request_pin(
+                    |prev_error| {
+                        callbacks.request_secret(&format!(
+                            "{}{}{}",
+                            prev_error.as_deref().unwrap_or(""),
+                            prev_error.as_deref().map(|_| " ").unwrap_or(""),
+                            fl!(
+                                "plugin-enter-pin",
+                                yubikey_serial = self.yubikey.serial().to_string(),
+                            )
+                        ))
+                    },
+                    self.yubikey.serial(),
+                )? {
+                    Ok(pin) => pin,
+                    Err(_) => {
+                        return Ok(Err(identity::Error::Identity {
+                            index: self.identity_index,
+                            message: fl!(
+                                "plugin-err-pin-required",
+                                yubikey_serial = self.yubikey.serial().to_string(),
+                            ),
+                        }))
+                    }
+                }
             }
         };
         if let Err(e) = self.yubikey.verify_pin(pin.expose_secret().as_bytes()) {
