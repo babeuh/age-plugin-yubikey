@@ -10,6 +10,11 @@ which enables files to be encrypted to age identities stored on YubiKeys.
 |-------------|-------------|
 | Cargo (Rust 1.65+) | `cargo install age-plugin-yubikey` |
 | Homebrew (macOS or Linux) | `brew install age-plugin-yubikey` |
+| Arch Linux | `pacman -S age-plugin-yubikey` |
+| Debian | [Debian package](https://github.com/str4d/age-plugin-yubikey/releases) |
+| NixOS | Add to config:<br>`environment.systemPackages = [`<br>`  pkgs.age-plugin-yubikey`<br>`];`<br>Or run `nix-env -i age-plugin-yubikey` |
+| Ubuntu 20.04+ | [Debian package](https://github.com/str4d/age-plugin-yubikey/releases) |
+| OpenBSD | `pkg_add age-plugin-yubikey` (security/age-plugin-yubikey) |
 
 On Windows, Linux, and macOS, you can use the
 [pre-built binaries](https://github.com/str4d/age-plugin-yubikey/releases).
@@ -24,8 +29,10 @@ is installed and running.
 | Environment | CLI command |
 |-------------|-------------|
 | Debian or Ubuntu | `sudo apt-get install pcscd` |
+| Fedora | `sudo dnf install pcsc-lite` |
 | OpenBSD | As ```root``` do:<br>`pkg_add pcsc-lite ccid`<br>`rcctl enable pcscd`<br>`rcctl start pcscd` |
 | FreeBSD | As ```root``` do:<br>`pkg install pcsc-lite libccid`<br>`service pcscd enable`<br>`service pcscd start` |
+| Arch | `sudo pacman -S pcsclite pcsc-tools yubikey-manager`<br>`sudo systemctl enable pcscd`<br>`sudo systemctl start pcscd`| 
 
 When installing via Cargo, you also need to ensure that the development headers
 for the `pcsc-lite` library are available, so that the `pcsc-sys` crate can be
@@ -34,6 +41,7 @@ compiled.
 | Environment | CLI command |
 |-------------|-------------|
 | Debian or Ubuntu | `sudo apt-get install libpcsclite-dev` |
+| Fedora | `sudo dnf install pcsc-lite-devel` |
 
 ### Windows Subsystem for Linux (WSL)
 
